@@ -2,7 +2,8 @@ from itertools import cycle, product
 from collections.abc import Iterable
 
 class Game:
-    def __init__(self, board_x: int, board_y: int) -> None:
+    def __init__(self, board_x: int, board_y: int, winning_length: int) -> None:
+        self.winning_length = winning_length
         self.board_x = board_x
         self.board_y = board_y
         self.board: list[list[int]] = [[0] * board_y for _ in range(board_x)]
@@ -22,9 +23,8 @@ class Game:
         )
 
     def _check_win(self, x: int, y: int, p: int) -> int:
-        # lets generalise this
         lines = [
-            [shift(x, y, i) for i in range(-4, 4 + 1) if self._in_bounds(*shift(x, y, i))]
+            [shift(x, y, i) for i in range(-(self.winning_length - 1), self.winning_length) if self._in_bounds(*shift(x, y, i))]
             for shift in (
                 lambda x, y, i: (x + i, y),
                 lambda x, y, i: (x, y + i),
@@ -32,10 +32,6 @@ class Game:
                 lambda x, y, i: (x - i, y + i)
             )
         ]
-        # h_line = [(x + i, y) for i in range(-4, 4 + 1) if self._in_bounds(x + i, y)]
-        # v_line = [(x, y + i) for i in range(-4, 4 + 1) if self._in_bounds(x, y + i)]
-        # d1_line = [(x + i, y + i) for i in range(-4, 4 + 1) if self._in_bounds(x + i, y + i)]
-        # d2_line = [(x - i, y + i) for i in range(-4, 4 + 1) if self._in_bounds(x - i, y + i)]
 
         for line in lines:
             accum_stones = 0
@@ -45,7 +41,7 @@ class Game:
                 else:
                     accum_stones = 0
                 
-                if accum_stones == 5:
+                if accum_stones == self.winning_length:
                     print(f"{line=}")
                     return p
 
