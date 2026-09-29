@@ -22,12 +22,22 @@ class Game:
         )
 
     def _check_win(self, x: int, y: int, p: int) -> int:
-        h_line = [(x + i, y) for i in range(-4, 4 + 1) if self._in_bounds(x + i, y)]
-        v_line = [(x, y + i) for i in range(-4, 4 + 1) if self._in_bounds(x, y + i)]
-        d1_line = [(x + i, y + i) for i in range(-4, 4 + 1) if self._in_bounds(x + i, y + i)]
-        d2_line = [(x - i, y + i) for i in range(-4, 4 + 1) if self._in_bounds(x - i, y + i)]
+        # lets generalise this
+        lines = [
+            [shift(x, y, i) for i in range(-4, 4 + 1) if self._in_bounds(*shift(x, y, i))]
+            for shift in (
+                lambda x, y, i: (x + i, y),
+                lambda x, y, i: (x, y + i),
+                lambda x, y, i: (x + i, y + i),
+                lambda x, y, i: (x - i, y + i)
+            )
+        ]
+        # h_line = [(x + i, y) for i in range(-4, 4 + 1) if self._in_bounds(x + i, y)]
+        # v_line = [(x, y + i) for i in range(-4, 4 + 1) if self._in_bounds(x, y + i)]
+        # d1_line = [(x + i, y + i) for i in range(-4, 4 + 1) if self._in_bounds(x + i, y + i)]
+        # d2_line = [(x - i, y + i) for i in range(-4, 4 + 1) if self._in_bounds(x - i, y + i)]
 
-        for line in (h_line, v_line, d1_line, d2_line):
+        for line in lines:
             accum_stones = 0
             for cx, cy in line:
                 if self.board[cx][cy] == p:

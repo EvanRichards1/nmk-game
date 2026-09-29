@@ -1,2 +1,5 @@
 src/__pycache__
 main.py
+.pytest_cache
+.venv
+__pycache__
