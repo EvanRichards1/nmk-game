@@ -1,6 +1,6 @@
 import pytest
 
-import game
+import game, player
 
 gomoku_games = {
     (

@@ -91,7 +91,7 @@ class Game:
     def __init__(self, board: Board, player1: Player, player2: Player) -> None:
         self.board = board
         self.player1 = player1
-        self.player2 = player
+        self.player2 = player2
     
     def move(self) -> int:
         """
