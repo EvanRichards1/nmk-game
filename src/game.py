@@ -1,7 +1,7 @@
 from itertools import cycle, product
 from collections.abc import Iterable
 
-class Game:
+class Board:
     """
     Represents the state of any "m,n,k-game" where Game(m, n, k) should be equivalent to an "m,n,k-game"
     """
@@ -83,3 +83,34 @@ class Game:
                 return win
         
         return 0
+
+class Player:
+    pass
+
+class Game:
+    def __init__(self, board: Board, player1: Player, player2: Player) -> None:
+        self.board = board
+        self.player1 = player1
+        self.player2 = player
+    
+    def move(self) -> int:
+        """
+        Request a move from the current player then make it.
+        Returns the winner.
+        """
+        player = self.player1 if self.board.player == 1 else self.player2
+
+        move = player.make_move(self.board.board)
+        
+        return self.board.place(move)
+    
+    def run(self) -> int:
+        """
+        Make moves until a player wins.
+        Return the winner.
+        """
+        winner = 0
+        while not winner:
+            winner = self.move()
+
+        return winner
