@@ -17,7 +17,7 @@ gomoku_games = {
 
 def test_board():
     for moves, expected in gomoku_games.items():
-        g = game.Game(15, 15, 5)
+        g = game.Board(15, 15, 5)
         actual = g.places(moves)
         if not actual == expected:
             print(moves)

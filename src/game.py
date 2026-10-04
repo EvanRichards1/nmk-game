@@ -9,7 +9,7 @@ class Board:
         self.winning_length = winning_length
         self.board_x = board_x
         self.board_y = board_y
-        self.board: list[list[int]] = [[0] * board_y for _ in range(board_x)] if board else board
+        self.board: list[list[int]] = board if board else [[0] * board_y for _ in range(board_x)]
         self.players: int = cycle([2, 1])
         self.player: int = 1
 
@@ -50,7 +50,6 @@ class Board:
                     accum_stones = 0
                 
                 if accum_stones == self.winning_length:
-                    print(f"{line=}")
                     return p
 
     def place(self, x: int, y: int) -> int:
@@ -102,7 +101,7 @@ class Game:
 
         move = player.make_move(self.board.board)
         
-        return self.board.place(move)
+        return self.board.place(*move)
     
     def run(self) -> int:
         """
