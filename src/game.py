@@ -12,7 +12,7 @@ class Board:
         self.board: list[list[int]] = board if board else [[0] * board_y for _ in range(board_x)]
         self.players: int = cycle([2, 1])
         self.player: int = 1
-        self.placed_lines: dict[int, set[tuple[tuple[tuple[int, int], tuple[int, int]]], int]] = { 1: set(), 2: set()}
+        self.placed_lines: dict[int, set[tuple[tuple[tuple[int, int], tuple[int, int]], int]]] = { 1: set(), 2: set()}
 
     def __str__(self) -> str:
         return '\n'.join(str(row) for row in self.board)
@@ -44,7 +44,7 @@ class Board:
 
         for line in lines:
             accum_stones = 0
-            for i, (cx, cy) in enumerate(line):
+            for cx, cy in line:
                 if self.board[cx][cy] == p:
                     accum_stones += 1
                 else:
@@ -52,6 +52,17 @@ class Board:
 
                 if accum_stones == self.winning_length:
                     return p
+
+    def _find_line(self, x: int, y: int, direction: tuple[int, int]) -> tuple[tuple[tuple[int, int], tuple[int, int]], int]:
+        player_lines = self.placed_lines[self.player]
+        for (start,end), length in player_lines:
+            if (x, y) in (start, end) and (x + (length-1)*direction[0], y + (length-1)*direction[1]) in (start,end):
+                if direction[0] == -1 or direction[1] == -1:
+                    return (((x + (length-1)*direction[0], y+(length-1)*direction[1]), (x, y)), length)
+                return (((x, y), (x + (length-1)*direction[0], y+(length-1)*direction[1])), length)
+
+        return None
+            
 
 
     def place(self, x: int, y: int) -> int:
@@ -70,38 +81,66 @@ class Board:
         directions = [(1, 0), (0, 1), (1, 1), (1, -1)]
 
         player_lines = self.placed_lines[self.player]
-        print(player_lines)
-        neighbour = False
+        print(f"Player lines for {self.player}: {player_lines}")
+        has_neighbour = False
         for (dx, dy) in directions:
-            neg_has_current_player = self._in_bounds(x-dx, y-dy) and self.board[x-dx][y-dy] == self.player
-            pos_has_current_player = self._in_bounds(x+dx, y+dy) and self.board[x+dx][y+dy] == self.player
+            pos_x, neg_x = x + dx, x - dx
+            pos_y, neg_y = y + dy, y - dy
+            neg_has_current_player = self._in_bounds(neg_x, neg_y) and self.board[neg_x][neg_y] == self.player
+            pos_has_current_player = self._in_bounds(pos_x, pos_y) and self.board[pos_x][pos_y] == self.player
             if neg_has_current_player or pos_has_current_player:
-                neighbour = True
+                has_neighbour = True
                 print("Neighbour found!")
                 print(neg_has_current_player)
                 print(pos_has_current_player)
                 print(f"{x+dx}, {y+dy}")
-                if neg_has_current_player and not pos_has_current_player:
+                if neg_has_current_player and pos_has_current_player:
+                    # Both directions have existing lines. Find line that ends in (x-dx, y-dy) and line that starts with (x+dx, y+dy)
+                    # Delete both lines and replace with a new line that starts at the startpoitn of the first line, and ends with the endpoint of the 2nd. Length = line1 length + line2 length + 1
+                    left_line = self._find_line(x - dx, y - dy, (-dx, -dy))
+                    right_line = self._find_line(x + dx, y + dy, (dx, dy))
+                    if left_line is None:
+                        left_line = ((((x - dx, y - dy),(x - dx, y - dy))), 1)
+                    else:
+                        player_lines.remove(left_line)
+                    if right_line is None:
+                        right_line = ((((x + dx, y + dy),(x + dx, y + dy))), 1)
+                    else:
+                        player_lines.remove(right_line)
+
+                    (left_start, left_end), left_length = left_line
+                    (right_start, right_end), right_length = right_line
+                    player_lines.add((((left_start), (right_end)), left_length  + right_length + 1))
+
+                elif neg_has_current_player:
                     # Find line in set that ends in (x-dx, y-dy)
                     # Replace that lines endpoint with (x, y) and length with line.length + 1
-                    pass
-                elif pos_has_current_player and not neg_has_current_player:
+                    left_line = self._find_line(x - dx, y - dy, (-dx, -dy))
+                    if left_line is None:
+                        left_line = ((((x - dx, y - dy),(x - dx, y - dy))), 1)
+                    else:
+                        player_lines.remove(left_line)
+
+                    (left_start, (left_end_x, left_end_y)), left_length = left_line
+                    player_lines.add((((left_start), (left_end_x + dx, left_end_y + dy)), left_length + 1))
+                
+                elif pos_has_current_player:
                     # Find line that starts with (x+dx, y+dy)
                     # Replace that lines startpoint with (x, y) and length with line.length + 1
-                    pass
-                else:
-                    # Both directions have existing lines. Find line that ends in (x-dx, y-dy) and line that starts with (x+dx, y+dy)
-                    # Delete both lines and replace with a new line that starts at the startpoitn of the first line, and ends with the endpoitn of the 2nd. Length = line1 length + line2 length + 1
-                    pass
+                    line = self._find_line(x + dx, y + dy, (dx, dy))
+                    if line is None:
+                        line = ((((x + dx, y + dy), (x + dx, y + dy))), 1)
+                    else:
+                        player_lines.remove(line)
+                    ((right_start_x, right_start_y), right_end), right_length = line
+                    player_lines.add((((right_start_x - dx, right_start_y - dy), right_end), right_length + 1))
+                    
 
-            
-
-
-
-
-
-        if not neighbour:
+                    
+        if not has_neighbour:
             player_lines.add((((x, y), (x, y)), 1))
+
+        print(player_lines)
 
 
         win = self._check_win(x, y, self.player)
@@ -117,6 +156,7 @@ class Board:
             (5, 6)
         )
         """
+        print(f"Places: {places}")
         for x, y in places:
             win = self.place(x, y)
             if win:
