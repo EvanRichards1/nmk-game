@@ -12,6 +12,7 @@ class Board:
         self.board: list[list[int]] = board if board else [[0] * board_y for _ in range(board_x)]
         self.players: int = cycle([2, 1])
         self.player: int = 1
+        self.placed_lines: dict[int, set[tuple[tuple[tuple[int, int], tuple[int, int]]], int]] = { 1: set(), 2: set()}
 
     def __str__(self) -> str:
         return '\n'.join(str(row) for row in self.board)
@@ -43,14 +44,15 @@ class Board:
 
         for line in lines:
             accum_stones = 0
-            for cx, cy in line:
+            for i, (cx, cy) in enumerate(line):
                 if self.board[cx][cy] == p:
                     accum_stones += 1
                 else:
                     accum_stones = 0
-                
+
                 if accum_stones == self.winning_length:
                     return p
+
 
     def place(self, x: int, y: int) -> int:
         """
@@ -63,6 +65,45 @@ class Board:
             raise Exception(f"{x, y} out of bounds!")
         
         self.board[x][y] = self.player
+        print(f"Player {self.player} placed a move at {(x, y)}")
+
+        directions = [(1, 0), (0, 1), (1, 1), (1, -1)]
+
+        player_lines = self.placed_lines[self.player]
+        print(player_lines)
+        neighbour = False
+        for (dx, dy) in directions:
+            neg_has_current_player = self._in_bounds(x-dx, y-dy) and self.board[x-dx][y-dy] == self.player
+            pos_has_current_player = self._in_bounds(x+dx, y+dy) and self.board[x+dx][y+dy] == self.player
+            if neg_has_current_player or pos_has_current_player:
+                neighbour = True
+                print("Neighbour found!")
+                print(neg_has_current_player)
+                print(pos_has_current_player)
+                print(f"{x+dx}, {y+dy}")
+                if neg_has_current_player and not pos_has_current_player:
+                    # Find line in set that ends in (x-dx, y-dy)
+                    # Replace that lines endpoint with (x, y) and length with line.length + 1
+                    pass
+                elif pos_has_current_player and not neg_has_current_player:
+                    # Find line that starts with (x+dx, y+dy)
+                    # Replace that lines startpoint with (x, y) and length with line.length + 1
+                    pass
+                else:
+                    # Both directions have existing lines. Find line that ends in (x-dx, y-dy) and line that starts with (x+dx, y+dy)
+                    # Delete both lines and replace with a new line that starts at the startpoitn of the first line, and ends with the endpoitn of the 2nd. Length = line1 length + line2 length + 1
+                    pass
+
+            
+
+
+
+
+
+        if not neighbour:
+            player_lines.add((((x, y), (x, y)), 1))
+
+
         win = self._check_win(x, y, self.player)
         self.player = next(self.players)
 
