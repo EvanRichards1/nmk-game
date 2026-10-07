@@ -34,8 +34,8 @@ def test_lines():
         print(f"Lines: {g.placed_lines}")
         player2_lines = g.placed_lines[2]
         player1_lines = g.placed_lines[1]
-        assert ((((5, 8), (7,6)), 3)) in player2_lines
-        assert ((((4, 5), (4,6)), 2)) in player2_lines
+        assert ((((5, 8), (7, 6)), 3)) in player2_lines
+        assert ((((4, 5), (4, 6)), 2)) in player2_lines
         assert ((((4, 7), (5, 7)), 2)) in player1_lines
 
         g2 = game.Board(15, 15, 5)
