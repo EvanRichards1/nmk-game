@@ -50,5 +50,11 @@ def test_lines():
         assert ((((5, 7), (6, 6)), 2)) in player1_lines
         assert ((((6, 6), (7, 7)), 2)) in player1_lines 
 
+def test_cardinality():
+    p = player.MonkeyThrowingDarts(1)
 
+    assert p._cardinality((1, 0), (1, 3), 3) == (0, 1)
+    assert p._cardinality((4, 5), (9, 5), 5) == (1, 0)
+    assert p._cardinality((2, 3), (4, 5), 2) == (1, 1)
+    assert p._cardinality((3, 2), (2, 3), 1) == (-1, 1)
         

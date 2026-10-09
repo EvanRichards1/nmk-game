@@ -176,8 +176,9 @@ class Game:
         """
         player = self.player1 if self.board.player == 1 else self.player2
 
-        move = player.make_move(self.board.board)
+        move = player.make_move(self.board.board, self.board.placed_lines[self.board.player])
         
+        print(self.board)
         return self.board.place(*move)
     
     def run(self) -> int:
