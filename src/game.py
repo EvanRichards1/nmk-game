@@ -178,7 +178,6 @@ class Game:
 
         move = player.make_move(self.board.board, self.board.placed_lines[self.board.player])
         
-        print(self.board)
         return self.board.place(*move)
     
     def run(self) -> int:
@@ -189,5 +188,6 @@ class Game:
         winner = 0
         while not winner:
             winner = self.move()
+            print(self.board)
 
         return winner

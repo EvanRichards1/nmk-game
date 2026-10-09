@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any
-from random import choice
+from random import choice, sample
 
 class Player(ABC):
     def __init__(self, player_id : int, strategy_params: dict[str, Any] = {}):
@@ -15,8 +15,9 @@ class Player(ABC):
     def _cardinality(self, start: tuple[int, int], end: tuple[int, int], line_length: int) -> tuple[int, int]:
         sx, sy = start
         ex, ey = end
+        # (0, 1) (1, 1) -> (1 - 0 / 1, 1 - 1 / 1)
 
-        return (ex - sx) // line_length - 1, (ey - sy) // line_length - 1
+        return (ex - sx) // (line_length - 1), (ey - sy) // (line_length - 1)
 
     @abstractmethod
     def make_move(self, board : list[list[int]]) -> tuple[int, int]:
@@ -39,18 +40,15 @@ class GreedyBot(Player):
         
         # Example: lines = {(((3, 2), (3, 5)), 3), ...}
         best_lines = sorted(list(lines), key = lambda l: l[1], reverse = True)
-        print(best_lines)
         
         for (start, end), length in best_lines:
-            cards = [self._cardinality(start, end, length)] if length > 1 else [(0, 1), (1, 0), (1, 1), (-1, 1)]
+            cards = [self._cardinality(start, end, length)] if length > 1 else sample([(0, 1), (1, 0), (1, 1), (-1, 1)], 4)
             for card_x, card_y in cards:
                 s_x, s_y = start
                 e_x, e_y = end
-                print(cards)
 
                 start_ext_x, start_ext_y = s_x - card_x, s_y - card_y
                 end_ext_x, end_ext_y = e_x + card_x, e_y + card_y
-                print(start_ext_x, start_ext_y)
 
                 if not board[start_ext_x][start_ext_y]:
                     return start_ext_x, start_ext_y
