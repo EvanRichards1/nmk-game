@@ -20,11 +20,11 @@ class Player(ABC):
         return (ex - sx) // (line_length - 1), (ey - sy) // (line_length - 1)
 
     @abstractmethod
-    def make_move(self, board : list[list[int]]) -> tuple[int, int]:
+    def make_move(self, board : list[list[int]], lines: dict[int, set[tuple[tuple[tuple[int, int], tuple[int, int]]], int]]) -> tuple[int, int]:
         pass
 
 class MonkeyThrowingDarts(Player):
-    def make_move(self, board: list[list[int]]) -> tuple[int, int]:
+    def make_move(self, board: list[list[int]], lines) -> tuple[int, int]:
         x, y = 0, 0
         while board[x][y] != 0:
             x, y = choice(range(len(board))), choice(range(len(board[0])))
@@ -32,14 +32,16 @@ class MonkeyThrowingDarts(Player):
         return x, y
 
 class GreedyBot(Player):
-    def make_move(self, board: list[list[int]], lines: set[tuple[tuple[tuple[int, int], tuple[int, int]]], int]) -> tuple[int, int]:
-        if not lines:
+    def make_move(self, board: list[list[int]], lines: dict[int, set[tuple[tuple[tuple[int, int], tuple[int, int]]], int]]) -> tuple[int, int]:
+        my_lines = lines[self.player_id]
+
+        if not my_lines:
             len_x = len(board) // 2
             len_y = len(board[0]) // 2
             return (len_x, len_y) if not board[len_x][len_y] else (len_x + 1, len_y)
         
         # Example: lines = {(((3, 2), (3, 5)), 3), ...}
-        best_lines = sorted(list(lines), key = lambda l: l[1], reverse = True)
+        best_lines = sorted(list(my_lines), key = lambda l: l[1], reverse = True)
         
         for (start, end), length in best_lines:
             cards = [self._cardinality(start, end, length)] if length > 1 else sample([(0, 1), (1, 0), (1, 1), (-1, 1)], 4)

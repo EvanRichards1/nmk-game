@@ -176,9 +176,15 @@ class Game:
         """
         player = self.player1 if self.board.player == 1 else self.player2
 
-        move = player.make_move(self.board.board, self.board.placed_lines[self.board.player])
+        for _ in range(self.board.board_x * self.board.board_y):
+            try:
+                move = player.make_move(self.board.board, self.board.placed_lines)
+                win = self.board.place(*move)
+                break
+            except Exception as e:
+                print(e)
         
-        return self.board.place(*move)
+        return win
     
     def run(self) -> int:
         """
@@ -188,6 +194,5 @@ class Game:
         winner = 0
         while not winner:
             winner = self.move()
-            print(self.board)
 
         return winner
