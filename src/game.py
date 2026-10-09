@@ -62,7 +62,7 @@ class Board:
         for (start, end), length in player_lines:
             endpoint = (x + (length-1)*direction[0], y + (length-1)*direction[1])
             if (x, y) in (start, end) and endpoint in (start,end):
-                if direction[0] == -1 or direction[1] == -1:
+                if direction[0] == -1 or (direction[0] == 0 and direction[1] == -1):
                     return ((endpoint, (x, y)), length)
                 return (((x, y), endpoint), length)
 

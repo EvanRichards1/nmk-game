@@ -58,4 +58,12 @@ def test_cardinality():
     assert p._cardinality((4, 5), (9, 5), 6) == (1, 0)
     assert p._cardinality((2, 3), (4, 5), 3) == (1, 1)
     assert p._cardinality((3, 2), (2, 3), 2) == (-1, 1)
-        
+
+
+
+def test_greedy():
+    b = game.Board(15, 15, 5)
+    player1 = player.GreedyBot(1)
+    player2 = player.GreedyBot(2)
+    g = game.Game(b, player1, player2)
+    g.run()
