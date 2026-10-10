@@ -15,7 +15,13 @@ class Board:
         self.placed_lines: dict[int, set[tuple[tuple[tuple[int, int], tuple[int, int]], int]]] = { 1: set(), 2: set()}
 
     def __str__(self) -> str:
-        return '\n'.join(str(row) for row in self.board)
+        board_pretty = "  "
+        board_pretty += " ".join(str(n) for n in range(self.board_x))
+
+        for y in range(self.board_y):
+            board_pretty += f"\n{y} " + " ".join([str(self.board[x][y]) for x in range(self.board_x)])
+        
+        return board_pretty
 
     def __repr__(self) -> str:
         return f"Game({self.board_x}, {self.board_y}, {self.winning_length})"

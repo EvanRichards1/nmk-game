@@ -23,6 +23,20 @@ class Player(ABC):
     def make_move(self, board : list[list[int]], lines: dict[int, set[tuple[tuple[tuple[int, int], tuple[int, int]]], int]]) -> tuple[int, int]:
         pass
 
+class CommandLinePlayer(Player):
+    def make_move(self, board: list[list[int]], lines) -> tuple[int, int]:
+        board_pretty = "  "
+        board_pretty += " ".join(str(n) for n in range(len(board)))
+
+        for y in range(len(board[0])):
+            board_pretty += f"\n{y} " + " ".join([str(board[x][y]) for x in range(len(board))])
+        
+        print(board_pretty)
+
+        move = tuple(int(n) for n in input("Move (format: x, y): ").split(','))
+
+        return move
+
 class MonkeyThrowingDarts(Player):
     def make_move(self, board: list[list[int]], lines) -> tuple[int, int]:
         x, y = 0, 0
@@ -33,6 +47,9 @@ class MonkeyThrowingDarts(Player):
 
 class GreedyBot(Player):
     def make_move(self, board: list[list[int]], lines: dict[int, set[tuple[tuple[tuple[int, int], tuple[int, int]]], int]]) -> tuple[int, int]:
+        board_x = len(board)
+        board_y = len(board[0])
+
         my_lines = lines[self.player_id]
 
         if not my_lines:
@@ -57,4 +74,4 @@ class GreedyBot(Player):
                 elif not board[end_ext_x][end_ext_y]:
                     return end_ext_x, end_ext_y
         
-        return 0, 0
+        return choice(range(board_x)), choice(range(board_y))
