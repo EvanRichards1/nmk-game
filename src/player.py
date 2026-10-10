@@ -69,9 +69,9 @@ class GreedyBot(Player):
                 start_ext_x, start_ext_y = s_x - card_x, s_y - card_y
                 end_ext_x, end_ext_y = e_x + card_x, e_y + card_y
 
-                if not board[start_ext_x][start_ext_y]:
+                if start_ext_x in range(board_x) and start_ext_y in range(board_y) and not board[start_ext_x][start_ext_y]:
                     return start_ext_x, start_ext_y
-                elif not board[end_ext_x][end_ext_y]:
+                elif end_ext_x in range(board_x) and end_ext_y in range(board_y) and not board[end_ext_x][end_ext_y]:
                     return end_ext_x, end_ext_y
         
         return choice(range(board_x)), choice(range(board_y))

@@ -13,6 +13,8 @@ class Board:
         self.players: int = cycle([2, 1])
         self.player: int = 1
         self.placed_lines: dict[int, set[tuple[tuple[tuple[int, int], tuple[int, int]], int]]] = { 1: set(), 2: set()}
+        self.remaining_space: set[tuple[int, int]] = {(x, y) for x in range(board_x) for y in range(board_y)}
+        self.history: list[tuple[int, int]] = []
 
     def __str__(self) -> str:
         board_pretty = "  "
@@ -81,8 +83,11 @@ class Board:
         Place a piece for the current player at position (x, y) on the board.
         e.g. self.place(3, 5)
         """
+        if not self.remaining_space:
+            return 3
+
         if self.board[x][y]:
-            raise Exception("Cannot place on occupied cell!")
+            raise Exception(f"{x, y} is an occupied cell! ")
         elif not self._in_bounds(x, y):
             raise Exception(f"{x, y} out of bounds!")
         
@@ -92,6 +97,9 @@ class Board:
 
         win = self._check_win(x, y, self.player)
         self.player = next(self.players)
+
+        self.history.append((x, y))
+        self.remaining_space.remove((x, y))
 
         return win
 

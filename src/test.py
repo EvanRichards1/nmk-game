@@ -15,6 +15,16 @@ gomoku_games = {
     ): 2
 }
 
+tictacto = {
+    (
+        (1, 1), (1, 0),
+        (0, 0), (2, 2),
+        (0, 2), (2, 0),
+        (2, 1), (0, 1),
+        (1, 2)
+    ): 3
+}
+
 def test_board():
     for moves, expected in gomoku_games.items():
         g = game.Board(15, 15, 5)
@@ -23,6 +33,15 @@ def test_board():
             print(moves)
             print(g)
         
+        assert actual == expected
+    
+    for moves, expected in tictacto.items():
+        g = game.Board(3, 3, 3)
+        actual = g.places(moves)
+        if not actual == expected:
+            print(moves)
+            print(g)
+
         assert actual == expected
 
 
